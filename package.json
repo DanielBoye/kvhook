@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@krakenfx/verify": "^0.1.3"
+  }
+}

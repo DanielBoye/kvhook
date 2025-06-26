@@ -11,6 +11,7 @@ v4-periphery/=lib/uniswap-hooks/lib/v4-periphery/
 hookmate/=lib/hookmate/src/
 permit2/=lib/uniswap-hooks/lib/v4-periphery/lib/permit2/
 solmate/=lib/uniswap-hooks/lib/v4-core/lib/solmate/
+mocks/=lib/uniswap-hooks/lib/forge-std/src/mocks/
 
 @ensdomains/=lib/uniswap-hooks/lib/v4-core/node_modules/@ensdomains/
 @ethereum-attestation-service/=node_modules/@ethereum-attestation-service/

@@ -20,18 +20,32 @@ import {
     AttestationInvariantViolation 
 } from "@krakenfx/verify/src/libraries/AttestationErrors.sol";
 
-contract Kraken is BaseHook, KrakenVerifyAccessControl {
-    /// @notice Cache of verified users to save gas
-    mapping(address => bool) public preVerified;
-
-    /// @dev UID of the verified kraken user schema
+/**
+ * @title kvhook
+ * @notice Restricts swaps to users with valid Kraken attestations
+ * @dev Inherits from BaseHook and KrakenVerifyAccessControl
+ * @dev UID of the verified kraken user schema
+ * @dev Must match Kraken's attestation schema
+ * @dev Error thrown when user is not authorized
+ */
+contract kvhook is BaseHook, KrakenVerifyAccessControl {
     bytes32 private constant VERIFIED_SCHEMA_UID = 0x8ffa68bde25f7b88e042ea3dff55ff27217b7d1c4bf24f57967b285c5ffe4c8b;
 
+    /// @dev Error thrown when user is not authorized
+    error Unauthorized();
+    /**
+     * @notice Constructor that initializes the hook with the pool manager
+     * @param _poolManager The pool manager contract
+     */
     constructor(IPoolManager _poolManager)
         BaseHook(_poolManager)
     {}
 
-    /// @notice Specifies which Uniswap V4 hook callbacks are enabled
+    /**
+     * @notice Specifies enabled Uniswap V4 hook callbacks
+     * @dev Only beforeSwap is enabled to gate user access
+     * @return permissions Struct with hook permissions configuration
+     */
     function getHookPermissions()
         public
         pure
@@ -56,12 +70,19 @@ contract Kraken is BaseHook, KrakenVerifyAccessControl {
         });
     }
 
+    /**
+     * @notice Verifies user attestation status
+     * @dev Reverts with specific errors on verification failure
+     * @param sender User address to verify
+     * @return true Always returns true on successful verification
+     * @custom:error AttestationNotFound
+     * @custom:error AttestationExpired
+     * @custom:error AttestationRevoked
+     * @custom:error AttestationRecipientMismatch
+     * @custom:error AttestationSchemaMismatch
+     * @custom:error AttestationInvariantViolation
+     */
     function _verifyAndCheckSender(address sender) internal returns (bool) {
-        // Check if already pre-verified to save gas
-        // if (preVerified[sender]) {
-        //     return;
-        // }
-
         Attestation memory attestation = _getAttestation(
             sender,
             VERIFIED_SCHEMA_UID
@@ -73,21 +94,28 @@ contract Kraken is BaseHook, KrakenVerifyAccessControl {
             VERIFIED_SCHEMA_UID
         );
 
-        preVerified[sender] = true;
-
         return true;
     }
 
-    /// @notice Callback executed before a swap
+    /**
+     * @notice Hook executed before swap operations
+     * @dev Reverts transaction if user lacks valid attestation
+     * @param sender Transaction initiator address
+     * @param key Pool identifier
+     * @param swapParams Swap parameters
+     * @return selector Function selector for hook compliance
+     * @return swapDelta Required swap delta (always zero)
+     * @return swapFee Fee override (always 0 = use pool default)
+     */
     function _beforeSwap(
         address sender,
         PoolKey calldata key,
         SwapParams calldata swapParams,
         bytes calldata
     ) internal override returns (bytes4, BeforeSwapDelta, uint24) {
-        _verifyAndCheckSender(sender);
-
-        // do something
+        if (!_verifyAndCheckSender(sender)) {
+            revert Unauthorized();
+        }
 
         return (this.beforeSwap.selector, BeforeSwapDeltaLibrary.ZERO_DELTA, 0);
     }

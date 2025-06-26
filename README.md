@@ -1,85 +1,334 @@
-# Uniswap v4 Hook Template
+# 🔱 Kraken Verify Permissioned Pool Hook (kvhook)
 
-**A template for writing Uniswap v4 Hooks 🦄**
+**A Uniswap V4 Hook for creating KYC-gated trading pools using Kraken Verify attestations on INK Network 🦄🔒**
 
-### Get Started
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Solidity](https://img.shields.io/badge/Solidity-0.8.24-blue.svg)](https://soliditylang.org/)
+[![INK Network](https://img.shields.io/badge/Network-INK%20Sepolia-purple.svg)](https://explorer-sepolia.inkonchain.com/)
 
-This template provides a starting point for writing Uniswap v4 Hooks, including a simple example and preconfigured test environment. Start by creating a new repository using the "Use this template" button at the top right of this page. Alternatively you can also click this link:
+## 🌟 What is kvhook?
 
-[![Use this Template](https://img.shields.io/badge/Use%20this%20Template-101010?style=for-the-badge&logo=github)](https://github.com/uniswapfoundation/v4-template/generate)
+**kvhook** (Kraken Verify Hook) is a Uniswap V4 hook that brings **real-world identity verification** to decentralized finance without exposing any personal data. By integrating Kraken Verify's verification system with Uniswap V4's hook architecture, kvhook creates a **compliant DeFi trading infrastructure** that bridges traditional financial regulations with decentralized protocols.
 
-1. The example hook [Counter.sol](src/Counter.sol) demonstrates the `beforeSwap()` and `afterSwap()` hooks
-2. The test template [Counter.t.sol](test/Counter.t.sol) preconfigures the v4 pool manager, test tokens, and test liquidity.
+### 🏛️ Regulatory Impact
 
-<details>
-<summary>Updating to v4-template:latest</summary>
+**For Regulators:**
+- **Compliance by Design**: Enables DeFi protocols to meet KYC/AML requirements automatically for Kraken users
+- **Risk Mitigation**: Automatically excludes sanctioned addresses and high-risk entities
+- **Regulatory Clarity**: Provides a template for compliant DeFi operations that regulators can endorse
 
-This template is actively maintained -- you can update the v4 dependencies, scripts, and helpers:
+## 🏗️ Architecture Overview
+
+The Kraken hook integrates multiple components to create a comprehensive KYC-gated trading system:
+
+```mermaid
+---
+config:
+  theme: redux
+---
+flowchart TD
+    A(["👤 User Initiates Swap"]) -- swap --> B(["🏊 Uniswap V4 Pool"])
+    B -- beforeSwap --> C(["🔱 Kraken Hook"])
+    C --> D{"🔐 Kraken Verify"}
+    D -- Query Attestation --> E(["📋 Ethereum Attestation Service"])
+    E --> F{"Attestation Exists?"}
+    F -- Yes --> G(["Valid Attestation"])
+    F -- No --> H(["❌ Reject Swap"])
+    G -- Return Attestation --> D
+    D -- Verify Schema --> I(["✅ Allow"])
+    B -- Execute Swap --> A
+    I -- allow --> B
+    style A fill:#BBDEFB
+    style B fill:#FFCDD2
+    style C fill:#ff6b6b
+    style D fill:#4ecdc4
+    style E fill:#45b7d1
+    style H fill:#D50000
+    style I fill:#C8E6C9
+
+```
+
+### 🚀 Future Development Roadmap
+
+kvhook is designed as a **foundational infrastructure** that will enable increasingly sophisticated compliance features:
+
+#### Phase 1: Trading Verification ✅
+- **Current**: Only verified Kraken users can execute swaps
+- **Benefits**: Compliance for trading regulated assets, institutional participation
+
+#### Phase 2: Liquidity Restrictions 🚧
+- **Planned**: Extend verification requirements to liquidity provision
+- **Use Cases**: Accredited investor pools, institutional-only liquidity
+- **Impact**: Complete ecosystem compliance for regulated markets
+
+#### Phase 3: Kraken-Exclusive Pools 📋
+- **Vision**: Pools accessible only to verified Kraken users
+- **Benefits**: 
+  - **Premium Experience**: Lower fees, priority routing, enhanced features
+  - **Community Building**: Verified user ecosystem with shared benefits
+  - **Brand Loyalty**: Incentivizes Kraken verification and platform usage
+
+#### Phase 4: Rewards & Incentives Program 🎁
+- **Verified User Benefits**:
+  - **Reduced Swap Fees**: 50-90% lower fees for verified users
+  - **Yield Boosts**: Enhanced LP rewards for verified liquidity providers
+  - **Exclusive Pools**: Access to high-yield, institutional-grade opportunities
+  - **Priority Access**: Early access to new token launches and features
+  - **Governance Rights**: Enhanced voting power in protocol decisions
+
+### 💎 Future vision
+
+**Why use Kraken Verified?**
+
+| Feature | Unverified Users | Verified Kraken Users |
+|---------|-----------------|----------------------|
+| **Swap Access** | ❌ Blocked | ✅ Full Access |
+| **Swap Fees** | N/A | 🔥 **75% Lower Fees** |
+| **LP Rewards** | N/A | 🚀 **2x Yield Boost** |
+| **Pool Access** | ❌ Public pools only | ✅ **Exclusive Verified Pools** |
+
+
+## 🚀 Quick Start
+
+**You only need 3 things to get started:**
+1. **Your private key** 
+2. **Blockscout API key** (for contract verification)
+3. **RPC URL** (for deploying the contracts)
+
+Everything else is automated! ✨
+
+### Step 1: Clone & Setup
+```bash
+git clone https://github.com/DanielBoye/kvhook.git
+cd kvhook
+```
+
+### Step 2: Create .env file
+```bash
+# Create .env with only these two required variables:
+echo "PRIVATE_KEY=your_private_key_here" > .env
+echo "BLOCKSCOUT_API_KEY=your_blockscout_api_key_here" >> .env
+echo "RPC_URL=https://rpc-gel-sepolia.inkonchain.com" >> .env
+```
+
+### Step 3: Deploy Everything
+```bash
+# 1. Approve deploy.sh to be executable
+chmod +x deploy.sh
+
+# 2. Deploy the Kraken hook and all contracts
+./deploy.sh
+
+# 3. Test the hook with sample swaps
+./interact.sh
+
+# 4. (Optional) Verify contracts
+./verify-contracts.sh
+```
+## 📋 Environment Variables
+
+After running the setup scripts, your `.env` file will be automatically populated with:
 
 ```bash
-git remote add template https://github.com/uniswapfoundation/v4-template
-git fetch template
-git merge template/main <BRANCH> --allow-unrelated-histories
+# ✅ YOU PROVIDE THESE:
+PRIVATE_KEY=your_private_key_here
+BLOCKSCOUT_API_KEY=your_blockscout_api_key_here
+RPC_URL=https://rpc-gel-sepolia.inkonchain.com
+
+# 🤖 AUTO-GENERATED BY SCRIPTS:
+CREATE2_FACTORY_ADDRESS=0x...
+POOL_MANAGER_ADDRESS=0x...
+HOOK_ADDRESS=0x...
+TOKEN0_ADDRESS=0x...
+TOKEN1_ADDRESS=0x...
+POOL_MODIFY_LIQUIDITY_TEST_ADDRESS=0x...
+
+# 🌐 NETWORK CONFIGURATION:
+CHAIN_ID=763373
+RPC_URL=https://rpc-gel-sepolia.inkonchain.com
+EXPLORER_URL=https://explorer-sepolia.inkonchain.com
+
+# 🏊 POOL SETTINGS:
+POOL_FEE=3000
+TICK_SPACING=120
+POOL_SWAP_TEST_ADDRESS=0x...
 ```
 
-</details>
 
-### Requirements
+## 🔧 Smart Contract Components
 
-This template is designed to work with Foundry (stable). If you are using Foundry Nightly, you may encounter compatibility issues. You can update your Foundry installation to the latest stable version by running:
+### 1. **kvhook.sol** - The Main Hook Contract
 
-```
-foundryup
-```
+The core hook that implements Uniswap V4's `BaseHook` interface with KYC verification:
 
-To set up the project, run the following commands in your terminal to install dependencies and run the tests:
-
-```
-forge install
-forge test
-```
-
-### Local Development
-
-Other than writing unit tests (recommended!), you can only deploy & test hooks on [anvil](https://book.getfoundry.sh/anvil/) locally. Scripts are available in the `script/` directory, which can be used to deploy hooks, create pools, provide liquidity and swap tokens. The scripts support both local `anvil` environment as well as running them directly on a production network.
-
-### Troubleshooting
-
-<details>
-
-#### Permission Denied
-
-When installing dependencies with `forge install`, Github may throw a `Permission Denied` error
-
-Typically caused by missing Github SSH keys, and can be resolved by following the steps [here](https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh)
-
-Or [adding the keys to your ssh-agent](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent#adding-your-ssh-key-to-the-ssh-agent), if you have already uploaded SSH keys
-
-#### Anvil fork test failures
-
-Some versions of Foundry may limit contract code size to ~25kb, which could prevent local tests to fail. You can resolve this by setting the `code-size-limit` flag
-
-```
-anvil --code-size-limit 40000
+```solidity
+contract kvhook is BaseHook, KrakenVerifyAccessControl {
+    // Verified user schema UID from Kraken Verify
+    bytes32 private constant VERIFIED_SCHEMA_UID = 0x8ffa68bde25f7b88e042ea3dff55ff27217b7d1c4bf24f57967b285c5ffe4c8b;
+    
+    // Only beforeSwap permission needed - prove a swap can only be executed by a verified user
+    function getHookPermissions() returns (Hooks.Permissions memory) {
+        return Hooks.Permissions({
+            beforeSwap: true,  // ✅ KYC check before swaps
+            // All other hooks: false (unrestricted to unauthenticated users)
+        });
+    }
+}
 ```
 
-#### Hook deployment failures
+**Key Design Decisions:**
+- **Minimal Permissions**: Only `beforeSwap` is enabled to demonstrate the ability to restrict access to a subset of users
+- **Liquidity Freedom**: LPs can add/remove liquidity without KYC
+- **Trading Restriction**: Only verified users can execute swaps
 
-Hook deployment failures are caused by incorrect flags or incorrect salt mining
+### 2. Deployment Script
 
-1. Verify the flags are in agreement:
-   - `getHookCalls()` returns the correct flags
-   - `flags` provided to `HookMiner.find(...)`
-2. Verify salt mining is correct:
-   - In **forge test**: the _deployer_ for: `new Hook{salt: salt}(...)` and `HookMiner.find(deployer, ...)` are the same. This will be `address(this)`. If using `vm.prank`, the deployer will be the pranking address
-   - In **forge script**: the deployer must be the CREATE2 Proxy: `0x4e59b44847b379578588920cA78FbF26c0B4956C`
-     - If anvil does not have the CREATE2 deployer, your foundry may be out of date. You can update it with `foundryup`
+**What it does:**
+- ✅ Mines the correct hook address using CREATE2
+- ✅ Deploys all Uniswap V4 infrastructure
+- ✅ Creates test tokens with initial supply
+- ✅ Initializes the pool with Kraken hook
+- ✅ Sets up test liquidity for immediate trading
 
-</details>
+## 🔐 KYC Verification Flow
 
-### Additional Resources
+### Step-by-Step Process
 
-- [Uniswap v4 docs](https://docs.uniswap.org/contracts/v4/overview)
-- [v4-periphery](https://github.com/uniswap/v4-periphery)
-- [v4-core](https://github.com/uniswap/v4-core)
-- [v4-by-example](https://v4-by-example.org)
+1. **User Initiates Swap**
+   ```solidity
+   // User calls swap on Uniswap V4 pool
+   poolManager.swap(poolKey, swapParams, hookData);
+   ```
+
+2. **Hook Callback Triggered**
+   ```solidity
+   // _beforeSwap is automatically called by BaseHook
+   function _beforeSwap(address sender, PoolKey calldata key, SwapParams calldata swapParams, bytes calldata)
+   ```
+
+3. **Sender Verification**
+   ```solidity
+   // Hook calls internal verification function
+   if (!_verifyAndCheckSender(sender)) {
+       revert Unauthorized();
+   }
+   ```
+
+4. **Attestation Retrieval**
+   ```solidity
+   // Get user's attestation from Kraken Verify EAS integration
+   Attestation memory attestation = _getAttestation(
+       sender,
+       VERIFIED_SCHEMA_UID
+   );
+   ```
+
+5. **Multi-Layer Verification**
+   ```solidity
+   // Verify attestation validity, expiration, and schema match
+   AttestationVerifier.verifyAttestation(
+       attestation,
+       sender,
+       VERIFIED_SCHEMA_UID
+   );
+   ```
+
+6. **Swap Authorization**
+    - If verification passes, return success and allow swap
+
+### Error Handling
+
+The hook inherits specific error messages for the different failure scenarios from the `KrakenVerifyAccessControl` contract:
+
+```solidity
+// Custom errors from KrakenVerifyAccessControl
+AttestationNotFound()           // User has no attestation
+AttestationExpired()           // Attestation has expired  
+AttestationRevoked()           // Attestation was revoked
+AttestationRecipientMismatch() // Wrong recipient address
+AttestationSchemaMismatch()    // Wrong schema UID
+AttestationInvariantViolation() // Invalid attestation data
+```
+
+## 🎯 Technical Specifications
+
+### Supported Networks
+- **INK Sepolia** (testnet): Chain ID 763373
+- **INK Mainnet**: Chain ID 57073
+
+### Hook Permissions
+```solidity
+Hooks.Permissions({
+    beforeInitialize: false,           // ❌ Pool creation unrestricted
+    afterInitialize: false,            // ❌ No post-init logic needed
+    beforeAddLiquidity: false,         // ❌ LP operations unrestricted  
+    beforeRemoveLiquidity: false,      // ❌ LP operations unrestricted
+    afterAddLiquidity: false,          // ❌ No post-LP logic needed
+    afterRemoveLiquidity: false,       // ❌ No post-LP logic needed
+    beforeSwap: true,                  // ✅ KYC verification required
+    afterSwap: false,                  // ❌ No post-swap logic needed
+    beforeDonate: false,               // ❌ Donations unrestricted
+    afterDonate: false,                // ❌ No post-donation logic
+    beforeSwapReturnDelta: false,      // ❌ No swap amount modification
+    afterSwapReturnDelta: false,       // ❌ No swap amount modification
+    afterAddLiquidityReturnDelta: false,    // ❌ No liquidity modification
+    afterRemoveLiquidityReturnDelta: false  // ❌ No liquidity modification
+})
+```
+
+## 🧪 Testing Your Hook
+
+After deployment, the `interact.sh` script will test several scenarios:
+
+### ✅ Success Case
+```bash
+🎉 SUCCESS! Swap completed successfully!
+✅ The Kraken hook authorized the transaction
+✅ Your wallet address (0x...) has valid attestation
+```
+
+### ❌ Failure Cases
+```bash
+❌ SWAP FAILED!
+🔒 Authorization failed: Your wallet address does not have valid attestation
+📋 Wallet Address: 0x...
+🔑 Required Schema UID: 0x8ffa68bde25f7b88e042ea3dff55ff27217b7d1c4bf24f57967b285c5ffe4c8b
+
+💡 To fix this:
+1. Get a valid attestation for your wallet address
+2. Ensure the attestation uses the correct schema UID  
+3. Make sure the attestation is not expired or revoked
+```
+
+## 🔗 Deployed Contract Explorer Links
+
+After deployment, you can view your contracts on INK Sepolia explorer:
+
+- **Hook Contract**: `https://explorer-sepolia.inkonchain.com/address/[HOOK_ADDRESS]`
+- **Pool Manager**: `https://explorer-sepolia.inkonchain.com/address/[POOL_MANAGER_ADDRESS]`
+- **Token0**: `https://explorer-sepolia.inkonchain.com/address/[TOKEN0_ADDRESS]`
+- **Token1**: `https://explorer-sepolia.inkonchain.com/address/[TOKEN1_ADDRESS]`
+
+## 🛠️ Advanced Configuration
+
+### Custom Pool Settings
+Modify these variables in your `.env` file:
+```bash
+POOL_FEE=3000        # Pool fee tier (0.3%)
+TICK_SPACING=120     # Price tick spacing
+```
+
+### Different Networks
+To deploy on INK Mainnet instead of Sepolia:
+1. Change `RPC_URL` to `https://rpc-gel.inkonchain.com`
+2. Update `CHAIN_ID` to `57073`
+3. Update explorer URL accordingly
+
+## 📚 Additional Resources
+
+- [Uniswap V4 Documentation](https://docs.uniswap.org/contracts/v4/overview)  
+- [Kraken Verify Documentation](https://docs.inkonchain.com/build/verify)
+- [Ethereum Attestation Service](https://easscan.org/)
+- [INK Network Explorer](https://explorer-sepolia.inkonchain.com/)
+
+---

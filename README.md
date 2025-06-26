@@ -38,13 +38,15 @@ flowchart TD
     D -- Verify Schema --> I(["✅ Allow"])
     B -- Execute Swap --> A
     I -- allow --> B
-    style A fill:#BBDEFB
-    style B fill:#FFCDD2
-    style C fill:#ff6b6b
-    style D fill:#4ecdc4
-    style E fill:#45b7d1
-    style H fill:#D50000
-    style I fill:#C8E6C9
+    style A fill:#E3F2FD,stroke:#1976D2,color:#000000
+    style B fill:#FFF3E0,stroke:#F57C00,color:#000000
+    style C fill:#FFEBEE,stroke:#D32F2F,color:#000000
+    style D fill:#E0F2F1,stroke:#388E3C,color:#000000
+    style E fill:#E1F5FE,stroke:#0288D1,color:#000000
+    style F fill:#F3E5F5,stroke:#7B1FA2,color:#000000
+    style G fill:#E8F5E8,stroke:#2E7D32,color:#000000
+    style H fill:#FFEBEE,stroke:#C62828,color:#000000
+    style I fill:#E8F5E8,stroke:#388E3C,color:#000000
 
 ```
 

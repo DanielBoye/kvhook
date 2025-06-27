@@ -52,7 +52,7 @@ flowchart TD
 
 ### 🚀 Future Development Roadmap
 
-kvhook is designed as a **foundational infrastructure** that will enable increasingly sophisticated compliance features:
+kvhook is designed as a **foundational infrastructure** that can be extended upon to enable increasingly sophisticated compliance features:
 
 #### Phase 1: Trading Verification ✅
 - **Current**: Only verified Kraken users can execute swaps
@@ -80,7 +80,7 @@ kvhook is designed as a **foundational infrastructure** that will enable increas
 
 ### 💎 Future vision
 
-**Why use Kraken Verified?**
+**Why use Kraken Verification?**
 
 | Feature | Unverified Users | Verified Kraken Users |
 |---------|-----------------|----------------------|

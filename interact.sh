@@ -31,7 +31,11 @@ for var in "${required_vars[@]}"; do
         echo "❌ Error: $var not found in .env file"
         exit 1
     fi
-    echo "✅ $var: ${!var}"
+    if [ "$var" == "PRIVATE_KEY" ]; then
+        echo "✅ $var: [***]"
+    else
+        echo "✅ $var: ${!var}"
+    fi
 done
 
 echo ""
